@@ -40,3 +40,6 @@ export interface UserRestrictions {
   allergies: string[];
   other: string;
 }
+export interface FavoriteItem extends RecommendationItem {
+  restaurantName: string;
+}

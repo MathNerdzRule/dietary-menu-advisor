@@ -17,10 +17,11 @@ import {
   Skull,
   Sun,
   Moon,
-  Monitor
+  Monitor,
+  Star
 } from 'lucide-react';
 import { createGeminiService, withRetry } from './services/geminiService';
-import type { AppState, Restaurant, Recommendations, UserRestrictions } from './types';
+import type { AppState, Restaurant, Recommendations, UserRestrictions, FavoriteItem, RecommendationItem } from './types';
 import { ALLERGY_OPTIONS, LOCATION_MESSAGES, ANALYSIS_MESSAGES } from './constants';
 
 const App: React.FC = () => {
@@ -33,6 +34,16 @@ const App: React.FC = () => {
   const [showOtherInput, setShowOtherInput] = useState(false);
   const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<FavoriteItem[]>(() => {
+    const saved = localStorage.getItem('favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Persist favorites
+  useEffect(() => {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
 
   // Sync theme with DOM
   useEffect(() => {
@@ -168,6 +179,16 @@ const App: React.FC = () => {
     }
   };
 
+  const toggleFavorite = (item: RecommendationItem, restaurantName: string) => {
+    setFavorites(prev => {
+      const isFav = prev.find(f => f.name === item.name && f.restaurantName === restaurantName);
+      if (isFav) {
+        return prev.filter(f => f.name !== item.name || f.restaurantName !== restaurantName);
+      }
+      return [...prev, { ...item, restaurantName }];
+    });
+  };
+
   const toggleAllergy = (allergy: string) => {
     setRestrictions(prev => ({
       ...prev,
@@ -299,6 +320,28 @@ const App: React.FC = () => {
                   <Search className="w-5 h-5" /> Find Restaurant
                 </button>
                 {!apiKey && <p className="text-center text-sm text-red-500 font-medium">Please enter your Gemini API key above to start.</p>}
+
+                {favorites.length > 0 && (
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+                      <Star size={14} className="fill-amber-400 text-amber-400" /> Recent Favorites
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {favorites.slice(-5).reverse().map((fav, i) => (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            setRestaurantName(fav.restaurantName);
+                          }}
+                          className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-left hover:border-nourish-300 transition-all group max-w-[200px]"
+                        >
+                          <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">{fav.name}</p>
+                          <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate">{fav.restaurantName}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {error && (
@@ -507,12 +550,26 @@ const App: React.FC = () => {
                     >
                       <div className="space-y-2">
                         <div className="flex justify-between items-start">
-                          <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 transition-colors">{item.name}</h4>
-                          {item.url && (
-                            <a href={item.url} target="_blank" className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                              <ExternalLink className="w-4 h-4 text-slate-400 dark:text-slate-500" />
-                            </a>
-                          )}
+                          <div className="flex-1">
+                            <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 transition-colors">{item.name}</h4>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <button 
+                              onClick={() => toggleFavorite(item, foundRestaurant!.name)}
+                              className={`p-2 rounded-lg transition-all ${
+                                favorites.find(f => f.name === item.name && f.restaurantName === foundRestaurant?.name)
+                                  ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-500' 
+                                  : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-300 dark:text-slate-600 hover:text-amber-500'
+                              }`}
+                            >
+                              <Star size={18} className={favorites.find(f => f.name === item.name && f.restaurantName === foundRestaurant?.name) ? 'fill-amber-500' : ''} />
+                            </button>
+                            {item.url && (
+                              <a href={item.url} target="_blank" className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                                <ExternalLink className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                              </a>
+                            )}
+                          </div>
                         </div>
                         <p className="text-slate-500 dark:text-slate-300 text-sm">{item.description}</p>
                       </div>
@@ -548,12 +605,26 @@ const App: React.FC = () => {
                       >
                         <div className="space-y-2">
                           <div className="flex justify-between items-start">
-                            <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-amber-700 transition-colors">{item.name}</h4>
-                             {item.url && (
-                              <a href={item.url} target="_blank" className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                                <ExternalLink className="w-4 h-4 text-slate-400 dark:text-slate-500" />
-                              </a>
-                            )}
+                            <div className="flex-1">
+                              <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-amber-700 transition-colors">{item.name}</h4>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <button 
+                                onClick={() => toggleFavorite(item, foundRestaurant!.name)}
+                                className={`p-2 rounded-lg transition-all ${
+                                  favorites.find(f => f.name === item.name && f.restaurantName === foundRestaurant?.name)
+                                    ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-500' 
+                                    : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-300 dark:text-slate-600 hover:text-amber-500'
+                                }`}
+                              >
+                                <Star size={18} className={favorites.find(f => f.name === item.name && f.restaurantName === foundRestaurant?.name) ? 'fill-amber-500' : ''} />
+                              </button>
+                              {item.url && (
+                                <a href={item.url} target="_blank" className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                                  <ExternalLink className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                                </a>
+                              )}
+                            </div>
                           </div>
                           <p className="text-slate-500 dark:text-slate-300 text-sm">{item.description}</p>
                         </div>
@@ -590,12 +661,26 @@ const App: React.FC = () => {
                       >
                         <div className="space-y-2">
                           <div className="flex justify-between items-start">
-                            <h4 className="text-xl font-bold text-red-900 dark:text-red-400">{item.name}</h4>
-                             {item.url && (
-                              <a href={item.url} target="_blank" className="p-2 hover:bg-red-100 dark:hover:bg-red-900 rounded-lg transition-colors">
-                                <ExternalLink className="w-4 h-4 text-red-400 dark:text-red-500" />
-                              </a>
-                            )}
+                            <div className="flex-1">
+                              <h4 className="text-xl font-bold text-red-900 dark:text-red-400">{item.name}</h4>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <button 
+                                onClick={() => toggleFavorite(item, foundRestaurant!.name)}
+                                className={`p-2 rounded-lg transition-all ${
+                                  favorites.find(f => f.name === item.name && f.restaurantName === foundRestaurant?.name)
+                                    ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-500' 
+                                    : 'hover:bg-red-100/50 dark:hover:bg-red-900/50 text-red-300 dark:text-red-700 hover:text-amber-500'
+                                }`}
+                              >
+                                <Star size={18} className={favorites.find(f => f.name === item.name && f.restaurantName === foundRestaurant?.name) ? 'fill-amber-500' : ''} />
+                              </button>
+                              {item.url && (
+                                <a href={item.url} target="_blank" className="p-2 hover:bg-red-100 dark:hover:bg-red-900 rounded-lg transition-colors">
+                                  <ExternalLink className="w-4 h-4 text-red-400 dark:text-red-500" />
+                                </a>
+                              )}
+                            </div>
                           </div>
                           <p className="text-slate-500 dark:text-slate-300 text-sm">{item.description}</p>
                         </div>
