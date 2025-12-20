@@ -10,7 +10,8 @@ import {
   XCircle, 
   ExternalLink,
   ChevronRight,
-  Info
+  Info,
+  LocateFixed
 } from 'lucide-react';
 import { createGeminiService, withRetry } from './services/geminiService';
 import type { AppState, Restaurant, Recommendations, UserRestrictions } from './types';
@@ -49,20 +50,46 @@ const App: React.FC = () => {
     localStorage.setItem('gemini_api_key', key);
   };
 
-  // Location Detection on Mount
-  useEffect(() => {
-    if (navigator.geolocation && gemini) {
-      navigator.geolocation.getCurrentPosition(async (pos) => {
+  const [isDetecting, setIsDetecting] = useState(false);
+
+  // Location Detection Function
+  const detectLocation = async () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setIsDetecting(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
         try {
-          const loc = await gemini.reverseGeocode(pos.coords.latitude, pos.coords.longitude);
-          setDetectedLocation(loc);
-          if (!manualLocation) setLocation(loc);
+          if (gemini) {
+            const loc = await gemini.reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+            setDetectedLocation(loc);
+            setLocation(loc);
+            setManualLocation(false);
+          }
         } catch (e) {
           console.error("Geocoding failed", e);
+          setError("Could not identify your city. Please enter it manually.");
+        } finally {
+          setIsDetecting(false);
         }
-      });
+      },
+      (err) => {
+        console.error("Location error", err);
+        setError("Location permission denied. Please enter your city manually.");
+        setIsDetecting(false);
+      }
+    );
+  };
+
+  // Detect on mount
+  useEffect(() => {
+    if (gemini && !location && !manualLocation) {
+      detectLocation();
     }
-  }, [gemini, manualLocation]);
+  }, [gemini]);
 
   // Loading Message Cycle
   useEffect(() => {
@@ -77,6 +104,7 @@ const App: React.FC = () => {
   // Handlers
   const handleStartSearch = async () => {
     if (!restaurantName) return setError("Please enter a restaurant name.");
+    if (!location) return setError("Please enter a location or detect your current one.");
     setError(null);
     setAppState('LOADING_MENU');
     try {
@@ -179,16 +207,28 @@ const App: React.FC = () => {
                     <label className="text-sm font-semibold text-slate-700 ml-1 flex items-center gap-1.5">
                       <MapPin className="w-4 h-4 text-nourish-500" /> Location
                     </label>
-                    <div className="relative">
+                    <div className="relative group">
                       <input 
                         className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-nourish-100 focus:border-nourish-400 outline-none transition-all pr-32"
-                        placeholder="City, State"
+                        placeholder="City, State or Zip"
                         value={location}
                         onChange={(e) => { setLocation(e.target.value); setManualLocation(true); }}
                       />
-                      {detectedLocation && !manualLocation && (
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-nourish-600 bg-nourish-50 px-2.2 py-1 rounded-lg">DETECTED</span>
-                      )}
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                        {detectedLocation && !manualLocation && (
+                          <span className="text-[10px] font-black tracking-tighter text-nourish-700 bg-nourish-100 px-2 py-1 rounded-lg uppercase">Auto</span>
+                        )}
+                        <button
+                          onClick={detectLocation}
+                          disabled={isDetecting}
+                          className={`p-2 rounded-xl transition-all ${
+                            isDetecting ? 'animate-pulse bg-slate-100' : 'hover:bg-nourish-50 text-slate-400 hover:text-nourish-600'
+                          }`}
+                          title="Detect my location"
+                        >
+                          <LocateFixed className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
