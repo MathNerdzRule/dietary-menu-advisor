@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { createGeminiService, withRetry } from './services/geminiService';
 import type { AppState, Restaurant, Recommendations, UserRestrictions } from './types';
-import { ALLERGY_OPTIONS, LOADING_MESSAGES } from './constants';
+import { ALLERGY_OPTIONS, LOCATION_MESSAGES, ANALYSIS_MESSAGES } from './constants';
 
 const App: React.FC = () => {
   // App State
@@ -97,11 +97,13 @@ const App: React.FC = () => {
   // Loading Message Cycle
   useEffect(() => {
     if (appState === 'LOADING_MENU' || appState === 'ANALYZING_MENU') {
+      const messages = appState === 'LOADING_MENU' ? LOCATION_MESSAGES : ANALYSIS_MESSAGES;
       const interval = setInterval(() => {
-        setLoadingMsgIdx((prev) => (prev + 1) % LOADING_MESSAGES.length);
+        setLoadingMsgIdx((prev) => (prev + 1) % messages.length);
       }, 2500);
       return () => clearInterval(interval);
     }
+    setLoadingMsgIdx(0);
   }, [appState]);
 
   // Handlers
@@ -270,7 +272,7 @@ const App: React.FC = () => {
               </div>
               <div className="text-center space-y-2">
                 <p className="text-2xl font-bold text-slate-800 transition-all duration-500">
-                  {LOADING_MESSAGES[loadingMsgIdx]}
+                  {appState === 'LOADING_MENU' ? LOCATION_MESSAGES[loadingMsgIdx] : ANALYSIS_MESSAGES[loadingMsgIdx]}
                 </p>
                 {appState === 'ANALYZING_MENU' && (
                   <p className="text-sm text-slate-400 font-medium">
@@ -396,7 +398,7 @@ const App: React.FC = () => {
                     onClick={handleAnalyze}
                     className="w-full bg-nourish-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-nourish-100 hover:bg-nourish-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                   >
-                    Analyze Menu & Safety
+                    Analyze Menu
                   </button>
                 </div>
               </div>

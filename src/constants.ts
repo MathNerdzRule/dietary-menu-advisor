@@ -17,12 +17,17 @@ Forbidden: Beef, pork, bacon, dark meat, whole grains, nuts, seeds, raw veg/frui
 Caution: High fat (fried, cream, butter).
 `;
 
-export const LOADING_MESSAGES = [
-  "Scouring the culinary digital landscape...",
+export const LOCATION_MESSAGES = [
   "Locating the restaurant entrance...",
-  "Retrieving the latest menu specials...",
+  "Confirming the physical address...",
+  "Identifying the specific kitchen...",
+  "Mapping the local flavor..."
+];
+
+export const ANALYSIS_MESSAGES = [
+  "Scouring the culinary digital landscape...",
+  "Retrieving the latest menu data...",
   "Scanning ingredients for safety...",
-  "Running dietary restriction checks...",
   "Consulting the AI chef...",
   "Almost ready to serve your advice..."
 ];
