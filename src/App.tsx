@@ -14,7 +14,10 @@ import {
   Info,
   LocateFixed,
   PlusCircle,
-  Skull
+  Skull,
+  Sun,
+  Moon,
+  Monitor
 } from 'lucide-react';
 import { createGeminiService, withRetry } from './services/geminiService';
 import type { AppState, Restaurant, Recommendations, UserRestrictions } from './types';
@@ -24,9 +27,34 @@ const App: React.FC = () => {
   // App State
   const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || import.meta.env.VITE_GEMINI_API_KEY || '');
   const [appState, setAppState] = useState<AppState>('INITIAL_SEARCH');
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
+    return (localStorage.getItem('theme') as any) || 'system';
+  });
   const [showOtherInput, setShowOtherInput] = useState(false);
   const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  // Sync theme with DOM
+  useEffect(() => {
+    const root = window.document.documentElement;
+    const applyTheme = (t: 'light' | 'dark') => {
+      root.classList.remove('light', 'dark');
+      root.classList.add(t);
+    };
+
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      applyTheme(systemTheme);
+      
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = (e: MediaQueryListEvent) => applyTheme(e.matches ? 'dark' : 'light');
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    } else {
+      applyTheme(theme);
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   // User Selections
   const [restaurantName, setRestaurantName] = useState('');
@@ -150,9 +178,9 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen font-sans selection:bg-nourish-200">
+    <div className="min-h-screen font-sans selection:bg-nourish-200 transition-colors duration-300">
       {/* Premium Gradient Background */}
-      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-nourish-50 via-white to-slate-50"></div>
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-nourish-50 via-white to-slate-50 dark:from-nourish-950 dark:via-emerald-950 dark:to-black"></div>
       
       <header className="px-6 py-8 md:px-12">
         <nav className="max-w-7xl mx-auto flex justify-between items-center">
@@ -160,20 +188,41 @@ const App: React.FC = () => {
             <div className="p-2 bg-nourish-600 rounded-xl shadow-lg shadow-nourish-200">
               <ChefHat className="text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">MENU<span className="text-nourish-600">ADVISOR</span></h1>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">MENU<span className="text-nourish-600">ADVISOR</span></h1>
           </div>
-          
-          {!apiKey && (
-            <div className="glass-card px-4 py-2 rounded-2xl flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-nourish-600" />
-              <input 
-                type="password" 
-                placeholder="Gemini API Key" 
-                className="bg-transparent text-sm focus:outline-none w-32 md:w-48"
-                onChange={(e) => saveApiKey(e.target.value)}
-              />
+          <div className="flex items-center gap-4">
+            {!apiKey && (
+              <div className="glass-card px-4 py-2 rounded-2xl flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-nourish-600" />
+                <input 
+                  type="password" 
+                  placeholder="Gemini API Key" 
+                  className="bg-transparent text-sm focus:outline-none w-32 md:w-48 text-slate-900 dark:text-slate-100"
+                  onChange={(e) => saveApiKey(e.target.value)}
+                />
+              </div>
+            )}
+            
+            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl gap-1">
+              {[
+                { id: 'light', icon: Sun },
+                { id: 'system', icon: Monitor },
+                { id: 'dark', icon: Moon }
+              ].map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setTheme(t.id as any)}
+                  className={`p-1.5 rounded-lg transition-all ${
+                    theme === t.id 
+                      ? 'bg-white dark:bg-slate-700 text-nourish-600 shadow-sm' 
+                      : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                  }`}
+                >
+                  <t.icon size={16} />
+                </button>
+              ))}
             </div>
-          )}
+          </div>
         </nav>
       </header>
 
@@ -188,7 +237,7 @@ const App: React.FC = () => {
               className="space-y-12 py-12"
             >
               <div className="text-center space-y-4">
-                <h2 className="text-5xl font-extrabold text-slate-900 leading-tight">
+                <h2 className="text-5xl font-extrabold text-slate-900 dark:text-slate-100 leading-tight">
                   Safely navigate <br />any restaurant menu.
                 </h2>
                 <p className="text-lg text-slate-500 max-w-lg mx-auto">
@@ -199,23 +248,23 @@ const App: React.FC = () => {
               <div className="glass-card p-8 rounded-[2rem] space-y-8">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700 ml-1 flex items-center gap-1.5">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1 flex items-center gap-1.5">
                       <Search className="w-4 h-4 text-nourish-500" /> Restaurant Name
                     </label>
                     <input 
-                      className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-nourish-100 focus:border-nourish-400 outline-none transition-all"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-nourish-100 focus:border-nourish-400 outline-none transition-all text-slate-900 dark:text-slate-100"
                       placeholder="e.g. The Cheesecake Factory"
                       value={restaurantName}
                       onChange={(e) => setRestaurantName(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700 ml-1 flex items-center gap-1.5">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1 flex items-center gap-1.5">
                       <MapPin className="w-4 h-4 text-nourish-500" /> Location
                     </label>
                     <div className="relative group">
                       <input 
-                        className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-nourish-100 focus:border-nourish-400 outline-none transition-all pr-32"
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-nourish-100 focus:border-nourish-400 outline-none transition-all pr-32 text-slate-900 dark:text-slate-100"
                         placeholder="City, State, or Zip Code"
                         value={location}
                         onChange={(e) => { setLocation(e.target.value); setManualLocation(true); }}
@@ -252,7 +301,7 @@ const App: React.FC = () => {
               {error && (
                 <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-3 border border-red-100">
                   <AlertTriangle className="flex-shrink-0" />
-                  <p className="font-medium">{error}</p>
+                  <p className="font-medium text-red-600">{error}</p>
                 </div>
               )}
             </motion.div>
@@ -302,9 +351,9 @@ const App: React.FC = () => {
                   <ChefHat size={120} />
                 </div>
                 
-                <div className="space-y-4 relative z-10 text-center border-b border-slate-100 pb-8">
+                <div className="space-y-4 relative z-10 text-center border-b border-slate-100 dark:border-slate-800 pb-8">
                   <div className="space-y-2">
-                    <h3 className="text-3xl font-black text-slate-900">{foundRestaurant.name}</h3>
+                    <h3 className="text-3xl font-black text-slate-900 dark:text-slate-100">{foundRestaurant.name}</h3>
                     <p className="text-slate-500 font-medium">{foundRestaurant.address}</p>
                   </div>
 
@@ -359,8 +408,8 @@ const App: React.FC = () => {
                           onClick={() => toggleAllergy(allergy)}
                           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                             restrictions.allergies.includes(allergy)
-                              ? 'bg-slate-800 text-white shadow-lg shadow-slate-200'
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                              ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900 shadow-lg shadow-slate-200 dark:shadow-none'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                           }`}
                         >
                           {allergy}
@@ -370,8 +419,8 @@ const App: React.FC = () => {
                         onClick={() => setShowOtherInput(!showOtherInput)}
                         className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${
                           showOtherInput || restrictions.other
-                            ? 'bg-nourish-100 text-nourish-700'
-                            : 'bg-white border-2 border-dashed border-slate-200 text-slate-400 hover:border-slate-300'
+                            ? 'bg-nourish-100 dark:bg-nourish-900 text-nourish-700 dark:text-nourish-300'
+                            : 'bg-white dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700 text-slate-400 hover:border-slate-300'
                         }`}
                       >
                         <PlusCircle size={14} /> Other
@@ -386,7 +435,7 @@ const App: React.FC = () => {
                       >
                         <input 
                           autoFocus
-                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-4 focus:ring-nourish-100 outline-none transition-all text-sm"
+                          className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-4 focus:ring-nourish-100 outline-none transition-all text-sm text-slate-900 dark:text-slate-100"
                           placeholder="List any other foods to avoid (e.g. strawberries, cilantro)"
                           value={restrictions.other}
                           onChange={(e) => setRestrictions(prev => ({ ...prev, other: e.target.value }))}
@@ -413,7 +462,7 @@ const App: React.FC = () => {
               animate={{ opacity: 1 }}
               className="space-y-12 py-12"
             >
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-100 pb-8">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-100 dark:border-slate-800 pb-8">
                 <div className="space-y-2">
                   <button 
                     onClick={() => setAppState('INITIAL_SEARCH')}
@@ -421,14 +470,14 @@ const App: React.FC = () => {
                   >
                     <ChevronRight className="rotate-180 w-4 h-4" /> Start Over
                   </button>
-                  <h2 className="text-4xl font-extrabold text-slate-900 italic">{foundRestaurant?.name}</h2>
-                  <p className="text-slate-500 font-medium">Personalized Safety Recommendations</p>
+                  <h2 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100 italic">{foundRestaurant?.name}</h2>
+                  <p className="text-slate-500 font-medium">Personalized Menu Recommendations</p>
                 </div>
                 
                 {!results.ingredientsFound && (
-                  <div className="bg-amber-50 rounded-2xl p-4 border border-amber-200 flex items-start gap-3 max-w-sm">
+                  <div className="bg-amber-50 dark:bg-amber-950 rounded-2xl p-4 border border-amber-200 dark:border-amber-800 flex items-start gap-3 max-w-sm">
                     <AlertTriangle className="text-amber-500 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-amber-800 font-medium leading-relaxed">
+                    <p className="text-xs text-amber-800 dark:text-amber-200 font-medium leading-relaxed">
                       Waring: Ingredients were not fully verified via web search. Please confirm with your server before ordering.
                     </p>
                   </div>
@@ -455,7 +504,7 @@ const App: React.FC = () => {
                     >
                       <div className="space-y-2">
                         <div className="flex justify-between items-start">
-                          <h4 className="text-xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">{item.name}</h4>
+                          <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 transition-colors">{item.name}</h4>
                           {item.url && (
                             <a href={item.url} target="_blank" className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
                               <ExternalLink className="w-4 h-4 text-slate-400" />
@@ -496,7 +545,7 @@ const App: React.FC = () => {
                       >
                         <div className="space-y-2">
                           <div className="flex justify-between items-start">
-                            <h4 className="text-xl font-bold text-slate-900 group-hover:text-amber-700 transition-colors">{item.name}</h4>
+                            <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-amber-700 transition-colors">{item.name}</h4>
                              {item.url && (
                               <a href={item.url} target="_blank" className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
                                 <ExternalLink className="w-4 h-4 text-slate-400" />
@@ -538,7 +587,7 @@ const App: React.FC = () => {
                       >
                         <div className="space-y-2">
                           <div className="flex justify-between items-start">
-                            <h4 className="text-xl font-bold text-red-900">{item.name}</h4>
+                            <h4 className="text-xl font-bold text-red-900 dark:text-red-400">{item.name}</h4>
                              {item.url && (
                               <a href={item.url} target="_blank" className="p-2 hover:bg-red-100 rounded-lg transition-colors">
                                 <ExternalLink className="w-4 h-4 text-red-400" />

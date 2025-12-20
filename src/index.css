@@ -17,14 +17,35 @@
 }
 
 @layer base {
+  :root {
+    --bg-main: #fcfdfb;
+    --text-main: #0f172a; /* slate-900 */
+    --card-bg: rgba(255, 255, 255, 0.7);
+    --card-border: rgba(255, 255, 255, 0.2);
+  }
+
+  .dark {
+    --bg-main: #0a0f0a; /* Deep emerald-tinted black */
+    --text-main: #f1f5f9; /* slate-100 */
+    --card-bg: rgba(20, 30, 20, 0.6);
+    --card-border: rgba(255, 255, 255, 0.05);
+  }
+
   body {
-    @apply bg-[#fcfdfb] text-slate-900 antialiased;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    @apply antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/70 backdrop-blur-xl border border-white/20 shadow-xl shadow-black/[0.03];
+    background-color: var(--card-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    @apply shadow-xl shadow-black/[0.03];
+    transition: background-color 0.3s ease, border-color 0.3s ease;
   }
 }
