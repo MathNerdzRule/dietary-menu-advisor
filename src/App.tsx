@@ -8,18 +8,17 @@ import {
   AlertTriangle, 
   CheckCircle2, 
   XCircle, 
-  Loader2,
   ExternalLink,
   ChevronRight,
   Info
 } from 'lucide-react';
 import { createGeminiService, withRetry } from './services/geminiService';
-import { AppState, Restaurant, Recommendations, UserRestrictions } from './types';
+import type { AppState, Restaurant, Recommendations, UserRestrictions } from './types';
 import { ALLERGY_OPTIONS, LOADING_MESSAGES } from './constants';
 
 const App: React.FC = () => {
   // App State
-  const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
+  const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || 'AIzaSyC63_XlrGJoN4TRmn2TI9FnYPE54_v2Re0');
   const [appState, setAppState] = useState<AppState>('INITIAL_SEARCH');
   const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);

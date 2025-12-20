@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Restaurant, Recommendations, UserRestrictions } from "../types";
+import type { Restaurant, Recommendations, UserRestrictions } from "../types";
 import { GP_CONTEXT, DEFAULT_SEARCH_CONTEXT } from "../constants";
 
 // Helper to extract JSON from AI markdown blocks
@@ -19,7 +19,7 @@ const extractJSON = (text: string) => {
 export const createGeminiService = (apiKey: string) => {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ 
-    model: "gemini-2.0-flash-exp" // Using stable latest flash for best tool support
+    model: "gemini-3-flash" 
   });
 
   const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
