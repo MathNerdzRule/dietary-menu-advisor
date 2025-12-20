@@ -188,7 +188,7 @@ const App: React.FC = () => {
             <div className="p-2 bg-nourish-600 rounded-xl shadow-lg shadow-nourish-200">
               <ChefHat className="text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">MENU<span className="text-nourish-600">ADVISOR</span></h1>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">MENU<span className="text-nourish-600">ADVISOR</span></h1>
           </div>
           <div className="flex items-center gap-4">
             {!apiKey && (
@@ -240,7 +240,7 @@ const App: React.FC = () => {
                 <h2 className="text-5xl font-extrabold text-slate-900 dark:text-slate-100 leading-tight">
                   Safely navigate <br />any restaurant menu.
                 </h2>
-                <p className="text-lg text-slate-500 max-w-lg mx-auto">
+                <p className="text-lg text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
                   Powered by AI to cross-reference ingredients with your specific dietary needs.
                 </p>
               </div>
@@ -321,11 +321,11 @@ const App: React.FC = () => {
                 <ChefHat className="absolute inset-0 m-auto text-nourish-600 w-8 h-8" />
               </div>
               <div className="text-center space-y-2">
-                <p className="text-2xl font-bold text-slate-800 transition-all duration-500">
+                <p className="text-2xl font-bold text-slate-800 dark:text-slate-100 transition-all duration-500">
                   {appState === 'LOADING_MENU' ? LOCATION_MESSAGES[loadingMsgIdx] : ANALYSIS_MESSAGES[loadingMsgIdx]}
                 </p>
                 {appState === 'ANALYZING_MENU' && (
-                  <p className="text-sm text-slate-400 font-medium">
+                  <p className="text-sm text-slate-400 dark:text-slate-500 font-medium">
                     Note: Thorough ingredient analysis can take up to 60 seconds...
                   </p>
                 )}
@@ -342,8 +342,8 @@ const App: React.FC = () => {
               className="py-12 space-y-8 max-w-xl mx-auto"
             >
               <div className="text-center space-y-2">
-                <span className="bg-nourish-100 text-nourish-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Restaurant Found</span>
-                <h2 className="text-3xl font-bold text-slate-900">Set your restrictions</h2>
+                <span className="bg-nourish-100 dark:bg-emerald-900/40 text-nourish-700 dark:text-emerald-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Restaurant Found</span>
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Set your restrictions</h2>
               </div>
 
               <div className="glass-card p-10 rounded-[2.5rem] border-nourish-200 border-2 overflow-hidden relative space-y-10">
@@ -354,7 +354,7 @@ const App: React.FC = () => {
                 <div className="space-y-4 relative z-10 text-center border-b border-slate-100 dark:border-slate-800 pb-8">
                   <div className="space-y-2">
                     <h3 className="text-3xl font-black text-slate-900 dark:text-slate-100">{foundRestaurant.name}</h3>
-                    <p className="text-slate-500 font-medium">{foundRestaurant.address}</p>
+                    <p className="text-slate-500 dark:text-slate-400 font-medium">{foundRestaurant.address}</p>
                   </div>
 
                   {foundRestaurant.website && (
@@ -369,7 +369,7 @@ const App: React.FC = () => {
                   
                   <button 
                     onClick={() => setAppState('INITIAL_SEARCH')}
-                    className="text-xs font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest flex items-center gap-1 mx-auto pt-2"
+                    className="text-xs font-bold text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 uppercase tracking-widest flex items-center gap-1 mx-auto pt-2"
                   >
                     Not the right place? Search again
                   </button>
@@ -377,7 +377,7 @@ const App: React.FC = () => {
 
                 <div className="space-y-8 relative z-10">
                   <div className="space-y-4">
-                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest ml-1">Core Restrictions</h3>
+                    <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Core Restrictions</h3>
                     <div className="flex flex-wrap gap-3">
                       {[
                         { id: 'glutenFree', label: 'Gluten Free' },
@@ -390,7 +390,7 @@ const App: React.FC = () => {
                           className={`px-6 py-3 rounded-xl border-2 font-semibold transition-all ${
                             restrictions[opt.id as keyof UserRestrictions] 
                               ? opt.highlight ? 'bg-orange-500 border-orange-500 text-white shadow-lg shadow-orange-100' : 'bg-nourish-600 border-nourish-600 text-white shadow-lg shadow-nourish-100'
-                              : 'bg-white border-slate-100 text-slate-600 hover:border-slate-300'
+                              : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300'
                           }`}
                         >
                           {opt.label}
@@ -400,7 +400,7 @@ const App: React.FC = () => {
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest ml-1">Common Allergies</h3>
+                    <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Common Allergies</h3>
                     <div className="flex flex-wrap gap-2">
                       {ALLERGY_OPTIONS.map((allergy) => (
                         <button
@@ -471,7 +471,7 @@ const App: React.FC = () => {
                     <ChevronRight className="rotate-180 w-4 h-4" /> Start Over
                   </button>
                   <h2 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100 italic">{foundRestaurant?.name}</h2>
-                  <p className="text-slate-500 font-medium">Personalized Menu Recommendations</p>
+                  <p className="text-slate-500 dark:text-slate-400 font-medium">Personalized Menu Recommendations</p>
                 </div>
                 
                 {!results.ingredientsFound && (
@@ -490,7 +490,7 @@ const App: React.FC = () => {
                   <div className="p-2 bg-emerald-100 rounded-lg">
                     <CheckCircle2 className="text-emerald-600" />
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-900 tracking-tight">Best Choices</h3>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Best Choices</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -506,18 +506,18 @@ const App: React.FC = () => {
                         <div className="flex justify-between items-start">
                           <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-emerald-700 transition-colors">{item.name}</h4>
                           {item.url && (
-                            <a href={item.url} target="_blank" className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-                              <ExternalLink className="w-4 h-4 text-slate-400" />
+                            <a href={item.url} target="_blank" className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                              <ExternalLink className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                             </a>
                           )}
                         </div>
-                        <p className="text-slate-500 text-sm">{item.description}</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">{item.description}</p>
                       </div>
-                      <div className="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-50">
-                        <p className="text-xs font-bold text-emerald-800 uppercase mb-1 flex items-center gap-1">
+                      <div className="bg-emerald-50/50 dark:bg-emerald-950/30 p-4 rounded-2xl border border-emerald-50 dark:border-emerald-900/50">
+                        <p className="text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase mb-1 flex items-center gap-1">
                           <Info size={10} /> Why it's safe
                         </p>
-                        <p className="text-xs text-emerald-700 font-medium leading-relaxed">{item.reason}</p>
+                        <p className="text-xs text-emerald-700 dark:text-emerald-300 font-medium leading-relaxed">{item.reason}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -531,7 +531,7 @@ const App: React.FC = () => {
                     <div className="p-2 bg-amber-100 rounded-lg">
                       <AlertTriangle className="text-amber-600" />
                     </div>
-                    <h3 className="text-2xl font-bold text-slate-900 tracking-tight">Eat with Caution</h3>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Eat with Caution</h3>
                   </div>
                   
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -547,18 +547,18 @@ const App: React.FC = () => {
                           <div className="flex justify-between items-start">
                             <h4 className="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-amber-700 transition-colors">{item.name}</h4>
                              {item.url && (
-                              <a href={item.url} target="_blank" className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-                                <ExternalLink className="w-4 h-4 text-slate-400" />
+                              <a href={item.url} target="_blank" className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                                <ExternalLink className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                               </a>
                             )}
                           </div>
-                          <p className="text-slate-500 text-sm">{item.description}</p>
+                          <p className="text-slate-500 dark:text-slate-400 text-sm">{item.description}</p>
                         </div>
-                        <div className="bg-amber-50/50 p-4 rounded-2xl border border-amber-50">
-                          <p className="text-xs font-bold text-amber-800 uppercase mb-1 flex items-center gap-1">
+                        <div className="bg-amber-50/50 dark:bg-amber-950/30 p-4 rounded-2xl border border-amber-50 dark:border-amber-900/50">
+                          <p className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase mb-1 flex items-center gap-1">
                             <XCircle size={10} /> Risks
                           </p>
-                          <p className="text-xs text-amber-700 font-medium leading-relaxed">{item.reason}</p>
+                          <p className="text-xs text-amber-700 dark:text-amber-300 font-medium leading-relaxed">{item.reason}</p>
                         </div>
                       </motion.div>
                     ))}
@@ -573,7 +573,7 @@ const App: React.FC = () => {
                     <div className="p-2 bg-red-100 rounded-lg">
                       <Skull className="text-red-600" />
                     </div>
-                    <h3 className="text-2xl font-bold text-slate-900 tracking-tight">STRICTLY AVOID</h3>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">STRICTLY AVOID</h3>
                   </div>
                   
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -589,18 +589,18 @@ const App: React.FC = () => {
                           <div className="flex justify-between items-start">
                             <h4 className="text-xl font-bold text-red-900 dark:text-red-400">{item.name}</h4>
                              {item.url && (
-                              <a href={item.url} target="_blank" className="p-2 hover:bg-red-100 rounded-lg transition-colors">
-                                <ExternalLink className="w-4 h-4 text-red-400" />
+                              <a href={item.url} target="_blank" className="p-2 hover:bg-red-100 dark:hover:bg-red-900 rounded-lg transition-colors">
+                                <ExternalLink className="w-4 h-4 text-red-400 dark:text-red-500" />
                               </a>
                             )}
                           </div>
-                          <p className="text-slate-500 text-sm">{item.description}</p>
+                          <p className="text-slate-500 dark:text-slate-400 text-sm">{item.description}</p>
                         </div>
-                        <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
-                          <p className="text-xs font-bold text-red-800 uppercase mb-1 flex items-center gap-1">
+                        <div className="bg-red-50 dark:bg-red-950/30 p-4 rounded-2xl border border-red-100 dark:border-red-900/50">
+                          <p className="text-xs font-bold text-red-800 dark:text-red-400 uppercase mb-1 flex items-center gap-1">
                             <AlertTriangle size={10} /> DANGER / EXCLUDED
                           </p>
-                          <p className="text-xs text-red-700 font-medium leading-relaxed">{item.reason}</p>
+                          <p className="text-xs text-red-700 dark:text-red-300 font-medium leading-relaxed">{item.reason}</p>
                         </div>
                       </motion.div>
                     ))}
