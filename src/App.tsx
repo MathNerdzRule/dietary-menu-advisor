@@ -186,7 +186,7 @@ const App: React.FC = () => {
                   Safely navigate <br />any restaurant menu.
                 </h2>
                 <p className="text-lg text-slate-500 max-w-lg mx-auto">
-                  Powered by AI to cross-reference ingredients with your specific dietary needs, including Gastroparesis.
+                  Powered by AI to cross-reference ingredients with your specific dietary needs.
                 </p>
               </div>
 
@@ -286,7 +286,7 @@ const App: React.FC = () => {
               </div>
 
               {error && (
-                <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-3 border border-red-100 animate-pulse">
+                <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-3 border border-red-100">
                   <AlertTriangle className="flex-shrink-0" />
                   <p className="font-medium">{error}</p>
                 </div>
@@ -312,7 +312,7 @@ const App: React.FC = () => {
                   {LOADING_MESSAGES[loadingMsgIdx]}
                 </p>
                 {appState === 'ANALYZING_MENU' && (
-                  <p className="text-sm text-slate-400 font-medium animate-pulse">
+                  <p className="text-sm text-slate-400 font-medium">
                     Note: Thorough ingredient analysis can take up to 60 seconds...
                   </p>
                 )}
