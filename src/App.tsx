@@ -210,7 +210,7 @@ const App: React.FC = () => {
                     <div className="relative group">
                       <input 
                         className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-nourish-100 focus:border-nourish-400 outline-none transition-all pr-32"
-                        placeholder="City, State or Zip"
+                        placeholder="City, State, or Zip Code"
                         value={location}
                         onChange={(e) => { setLocation(e.target.value); setManualLocation(true); }}
                       />
