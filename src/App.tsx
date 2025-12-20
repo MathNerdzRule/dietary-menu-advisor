@@ -11,7 +11,9 @@ import {
   ExternalLink,
   ChevronRight,
   Info,
-  LocateFixed
+  LocateFixed,
+  PlusCircle,
+  Skull
 } from 'lucide-react';
 import { createGeminiService, withRetry } from './services/geminiService';
 import type { AppState, Restaurant, Recommendations, UserRestrictions } from './types';
@@ -21,6 +23,7 @@ const App: React.FC = () => {
   // App State
   const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || import.meta.env.VITE_GEMINI_API_KEY || '');
   const [appState, setAppState] = useState<AppState>('INITIAL_SEARCH');
+  const [showOtherInput, setShowOtherInput] = useState(false);
   const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
@@ -233,54 +236,12 @@ const App: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest ml-1">Dietary Restrictions</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {[
-                      { id: 'glutenFree', label: 'Gluten Free' },
-                      { id: 'dairyFree', label: 'Dairy Free' },
-                      { id: 'gastroparesis', label: 'Gastroparesis', highlight: true },
-                    ].map((opt) => (
-                      <button
-                        key={opt.id}
-                        onClick={() => setRestrictions(prev => ({ ...prev, [opt.id]: !prev[opt.id as keyof UserRestrictions] }))}
-                        className={`px-6 py-3 rounded-xl border-2 font-semibold transition-all ${
-                          restrictions[opt.id as keyof UserRestrictions] 
-                            ? opt.highlight ? 'bg-orange-500 border-orange-500 text-white shadow-lg shadow-orange-100' : 'bg-nourish-600 border-nourish-600 text-white shadow-lg shadow-nourish-100'
-                            : 'bg-white border-slate-100 text-slate-600 hover:border-slate-300'
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="pt-2">
-                    <h4 className="text-xs font-bold text-slate-400 mb-3 ml-1">COMMON ALLERGIES</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {ALLERGY_OPTIONS.map((allergy) => (
-                        <button
-                          key={allergy}
-                          onClick={() => toggleAllergy(allergy)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                            restrictions.allergies.includes(allergy)
-                              ? 'bg-slate-800 text-white'
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                          }`}
-                        >
-                          {allergy}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
                 <button 
                   onClick={handleStartSearch}
                   disabled={!apiKey}
                   className="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold text-lg hover:bg-slate-800 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                 >
-                  <Search className="w-5 h-5" /> Start Analyzing Menu
+                  <Search className="w-5 h-5" /> Find Restaurant
                 </button>
                 {!apiKey && <p className="text-center text-sm text-red-500 font-medium">Please enter your Gemini API key above to start.</p>}
               </div>
@@ -328,17 +289,17 @@ const App: React.FC = () => {
               exit={{ opacity: 0, scale: 1.05 }}
               className="py-12 space-y-8 max-w-xl mx-auto"
             >
-               <div className="text-center space-y-2">
+              <div className="text-center space-y-2">
                 <span className="bg-nourish-100 text-nourish-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Restaurant Found</span>
-                <h2 className="text-3xl font-bold text-slate-900">Is this the correct place?</h2>
+                <h2 className="text-3xl font-bold text-slate-900">Set your restrictions</h2>
               </div>
 
-              <div className="glass-card p-10 rounded-[2.5rem] border-nourish-200 border-2 overflow-hidden relative">
+              <div className="glass-card p-10 rounded-[2.5rem] border-nourish-200 border-2 overflow-hidden relative space-y-10">
                 <div className="absolute top-0 right-0 p-8 opacity-5">
                   <ChefHat size={120} />
                 </div>
                 
-                <div className="space-y-6 relative z-10 text-center">
+                <div className="space-y-4 relative z-10 text-center border-b border-slate-100 pb-8">
                   <div className="space-y-2">
                     <h3 className="text-3xl font-black text-slate-900">{foundRestaurant.name}</h3>
                     <p className="text-slate-500 font-medium">{foundRestaurant.address}</p>
@@ -353,21 +314,90 @@ const App: React.FC = () => {
                       Visit Website <ExternalLink className="w-4 h-4" />
                     </a>
                   )}
+                  
+                  <button 
+                    onClick={() => setAppState('INITIAL_SEARCH')}
+                    className="text-xs font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest flex items-center gap-1 mx-auto pt-2"
+                  >
+                    Not the right place? Search again
+                  </button>
+                </div>
 
-                  <div className="pt-8 grid grid-cols-2 gap-4">
-                    <button 
-                      onClick={() => setAppState('INITIAL_SEARCH')}
-                      className="border-2 border-slate-200 text-slate-600 py-4 rounded-2xl font-bold hover:bg-slate-50 transition-all"
-                    >
-                      No, Search Again
-                    </button>
-                    <button 
-                      onClick={handleAnalyze}
-                      className="bg-nourish-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-nourish-100 hover:bg-nourish-700 active:scale-[0.98] transition-all"
-                    >
-                      Yes, That's It!
-                    </button>
+                <div className="space-y-8 relative z-10">
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest ml-1">Core Restrictions</h3>
+                    <div className="flex flex-wrap gap-3">
+                      {[
+                        { id: 'glutenFree', label: 'Gluten Free' },
+                        { id: 'dairyFree', label: 'Dairy Free' },
+                        { id: 'gastroparesis', label: 'Gastroparesis', highlight: true },
+                      ].map((opt) => (
+                        <button
+                          key={opt.id}
+                          onClick={() => setRestrictions(prev => ({ ...prev, [opt.id]: !prev[opt.id as keyof UserRestrictions] }))}
+                          className={`px-6 py-3 rounded-xl border-2 font-semibold transition-all ${
+                            restrictions[opt.id as keyof UserRestrictions] 
+                              ? opt.highlight ? 'bg-orange-500 border-orange-500 text-white shadow-lg shadow-orange-100' : 'bg-nourish-600 border-nourish-600 text-white shadow-lg shadow-nourish-100'
+                              : 'bg-white border-slate-100 text-slate-600 hover:border-slate-300'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest ml-1">Common Allergies</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {ALLERGY_OPTIONS.map((allergy) => (
+                        <button
+                          key={allergy}
+                          onClick={() => toggleAllergy(allergy)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            restrictions.allergies.includes(allergy)
+                              ? 'bg-slate-800 text-white shadow-lg shadow-slate-200'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          {allergy}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => setShowOtherInput(!showOtherInput)}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${
+                          showOtherInput || restrictions.other
+                            ? 'bg-nourish-100 text-nourish-700'
+                            : 'bg-white border-2 border-dashed border-slate-200 text-slate-400 hover:border-slate-300'
+                        }`}
+                      >
+                        <PlusCircle size={14} /> Other
+                      </button>
+                    </div>
+
+                    {showOtherInput && (
+                      <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="pt-2"
+                      >
+                        <input 
+                          autoFocus
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-4 focus:ring-nourish-100 outline-none transition-all text-sm"
+                          placeholder="List any other foods to avoid (e.g. strawberries, cilantro)"
+                          value={restrictions.other}
+                          onChange={(e) => setRestrictions(prev => ({ ...prev, other: e.target.value }))}
+                        />
+                      </motion.div>
+                    )}
+                  </div>
+
+                  <button 
+                    onClick={handleAnalyze}
+                    className="w-full bg-nourish-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-nourish-100 hover:bg-nourish-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                  >
+                    Analyze Menu & Safety
+                  </button>
                 </div>
               </div>
             </motion.div>
@@ -477,6 +507,48 @@ const App: React.FC = () => {
                             <XCircle size={10} /> Risks
                           </p>
                           <p className="text-xs text-amber-700 font-medium leading-relaxed">{item.reason}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                   </div>
+                </section>
+              )}
+
+              {/* Exclusion List (Strictly Avoid) */}
+              {results.avoid && results.avoid.length > 0 && (
+                <section className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-red-100 rounded-lg">
+                      <Skull className="text-red-600" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-slate-900 tracking-tight">STRICTLY AVOID</h3>
+                  </div>
+                  
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {results.avoid.map((item, i) => (
+                      <motion.div 
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="glass-card p-6 rounded-3xl border-red-100 border-2 space-y-4 hover:shadow-2xl hover:shadow-red-900/5 transition-all group bg-red-50/10"
+                      >
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-start">
+                            <h4 className="text-xl font-bold text-red-900">{item.name}</h4>
+                             {item.url && (
+                              <a href={item.url} target="_blank" className="p-2 hover:bg-red-100 rounded-lg transition-colors">
+                                <ExternalLink className="w-4 h-4 text-red-400" />
+                              </a>
+                            )}
+                          </div>
+                          <p className="text-slate-500 text-sm">{item.description}</p>
+                        </div>
+                        <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
+                          <p className="text-xs font-bold text-red-800 uppercase mb-1 flex items-center gap-1">
+                            <AlertTriangle size={10} /> DANGER / EXCLUDED
+                          </p>
+                          <p className="text-xs text-red-700 font-medium leading-relaxed">{item.reason}</p>
                         </div>
                       </motion.div>
                     ))}

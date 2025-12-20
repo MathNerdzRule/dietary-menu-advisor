@@ -22,6 +22,7 @@ export interface RecommendationItem extends MenuItem {
 export interface Recommendations {
   safe: RecommendationItem[];
   caution: RecommendationItem[];
+  avoid: RecommendationItem[];
   ingredientsFound: boolean;
 }
 

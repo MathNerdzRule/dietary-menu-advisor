@@ -61,6 +61,7 @@ export const createGeminiService = (apiKey: string) => {
       Return a JSON object with:
       safe: Array of items { name, description, reason, url }.
       caution: Array of items { name, description, reason, url }.
+      avoid: Array of items { name, description, reason, url } - These are items that are STRICTLY FORBIDDEN (e.g., if GP, include items with beef, whole grains, nuts, or high fiber skins).
       ingredientsFound: boolean (true if you found ingredient info via search).
       
       Menu JSON: ${JSON.stringify(menu)}
