@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --color-nourish-50: #f2f9f1;
+  --color-nourish-100: #e1f1df;
+  --color-nourish-200: #c5e5c1;
+  --color-nourish-300: #9ed298;
+  --color-nourish-400: #71b66b;
+  --color-nourish-500: #4e9849;
+  --color-nourish-600: #3c7b39;
+  --color-nourish-700: #326230;
+  --color-nourish-800: #2b4f2a;
+  --color-nourish-900: #254225;
+  --color-nourish-950: #112312;
+  
+  --font-sans: "Outfit", "Inter", ui-sans-serif, system-ui;
+}
+
+@layer base {
+  body {
+    @apply bg-[#fcfdfb] text-slate-900 antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-xl border border-white/20 shadow-xl shadow-black/[0.03];
+  }
+}
