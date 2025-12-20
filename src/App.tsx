@@ -1,4 +1,4 @@
-// Dietary Menu Advisor - Built with Antigravity AI (V1.2)
+// Dietary Menu Advisor - Built with Antigravity AI (V1.3)
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
