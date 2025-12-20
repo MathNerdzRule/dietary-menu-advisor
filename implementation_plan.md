@@ -2,34 +2,41 @@
 
 Building a premium, AI-powered menu advisor for users with strict dietary needs.
 
-## 1. Project Setup
+## 1. Project Setup & Deployment
 
 - [x] Initialize Vite/React/TS project.
-- [ ] Install dependencies (`@google/genai`, `tailwindcss`, `lucide-react`, `framer-motion`).
-- [ ] Configure Tailwind for premium aesthetics.
+- [x] Install dependencies (`@google/genai`, `tailwindcss`, `lucide-react`, `framer-motion`).
+- [x] Configure Tailwind v4 for premium aesthetics with "Nourish" color theme.
+- [x] Initialize Git and push to GitHub.
+- [x] Deploy to Vercel with environment variable configuration for Gemini API.
 
 ## 2. Global Styling & Design System
 
-- [ ] **Color Palette**: "Nourish" (Sage greens, soft creams, healthy accents).
-- [ ] **Typography**: "Outfit" or "Inter" for clarity and premium feel.
-- [ ] **Glassmorphism**: Soft, organic blur panels.
-- [ ] **Transitions**: Smooth state changes using Framer Motion.
+- [x] **Color Palette**: "Nourish" (Sage greens, soft creams, healthy accents).
+- [x] **Typography**: "Outfit" (Google Font) for clarity and premium feel.
+- [x] **Glassmorphism**: Soft, organic blur panels for a high-end medical/wellness aesthetic.
+- [x] **Transitions**: Smooth state changes using Framer Motion (Slide-and-fade).
 
 ## 3. Core Logic (Services)
 
-- [ ] `geminiService.ts`: Implement `findRestaurantAndGetMenu` and `getRecommendations` with Google Search tool and thinking budget.
-- [ ] `types.ts`: Define strict TypeScript interfaces for Menu, Restaurant, and State.
-- [ ] `constants.ts`: Store dietary restriction data and AI prompts.
+- [x] `geminiService.ts`: Implement `findRestaurantAndGetMenu` and `getRecommendations` using `gemini-3-flash-preview` with Google Search tool.
+- [x] `types.ts`: Defined strict TypeScript interfaces for Restaurants, MenuItems, and AppState.
+- [x] `constants.ts`: Contextual prompts for dietary restrictions (including detailed Gastroparesis logic).
 
-## 4. Components
+## 4. Features & UI Flow
 
-- [ ] `CombinedStartScreen`: Hero section + 2-step animated form.
-- [ ] `LoadingSpinner`: Engagement messages with premium circular animations.
-- [ ] `RestaurantConfirmation`: High-confidence card display.
-- [ ] `ResultsDisplay`: Organized safe/caution cards with ingredient verification status.
+- [x] **Streamlined 2-Step Search**:
+  - 1. Search for restaurant & location.
+  - 2. Confirm location & set dietary restrictions (Core + Allergies + Custom "Other").
+- [x] **Location Services**: Integrated GPS detection with manual city/state/zip override.
+- [x] **Loading Indicators**: Targeted messaging for discovery vs. menu analysis phases.
+- [x] **Results Display**:
+  - **Best Choices**: Green-themed safe items.
+  - **Eat with Caution**: Amber-themed restricted items.
+  - **Strictly Avoid**: Red-themed exclusion list for high-risk items (e.g., beef/fiber for GP).
 
-## 5. Deployment
+## 5. Completed & Refined
 
-- [ ] Initialize Git.
-- [ ] Push to `dietary-menu-advisor` repo.
-- [ ] Connect to Vercel.
+- [x] Removed hardcoded API keys for security.
+- [x] Generic marketing blurbs (removing condition-specific text from landing).
+- [x] Static loading/error notes (removed pulsing animations).
