@@ -188,7 +188,10 @@ const App: React.FC = () => {
             <div className="p-2 bg-nourish-600 rounded-xl shadow-lg shadow-nourish-200">
               <ChefHat className="text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">MENU<span className="text-nourish-600">ADVISOR</span></h1>
+            <h1 className="text-2xl font-bold tracking-tight">
+              <span className="text-slate-900 dark:text-white">MENU</span>
+              <span className="text-nourish-600">ADVISOR</span>
+            </h1>
           </div>
           <div className="flex items-center gap-4">
             {!apiKey && (
@@ -240,7 +243,7 @@ const App: React.FC = () => {
                 <h2 className="text-5xl font-extrabold text-slate-900 dark:text-slate-100 leading-tight">
                   Safely navigate <br />any restaurant menu.
                 </h2>
-                <p className="text-lg text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
+                <p className="text-lg text-slate-500 dark:text-slate-300 max-w-lg mx-auto font-medium">
                   Powered by AI to cross-reference ingredients with your specific dietary needs.
                 </p>
               </div>
@@ -353,8 +356,8 @@ const App: React.FC = () => {
                 
                 <div className="space-y-4 relative z-10 text-center border-b border-slate-100 dark:border-slate-800 pb-8">
                   <div className="space-y-2">
-                    <h3 className="text-3xl font-black text-slate-900 dark:text-slate-100">{foundRestaurant.name}</h3>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium">{foundRestaurant.address}</p>
+                    <h3 className="text-3xl font-black text-slate-900 dark:text-white">{foundRestaurant.name}</h3>
+                    <p className="text-slate-500 dark:text-slate-300 font-medium">{foundRestaurant.address}</p>
                   </div>
 
                   {foundRestaurant.website && (
@@ -470,8 +473,8 @@ const App: React.FC = () => {
                   >
                     <ChevronRight className="rotate-180 w-4 h-4" /> Start Over
                   </button>
-                  <h2 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100 italic">{foundRestaurant?.name}</h2>
-                  <p className="text-slate-500 dark:text-slate-400 font-medium">Personalized Menu Recommendations</p>
+                  <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white italic">{foundRestaurant?.name}</h2>
+                  <p className="text-slate-500 dark:text-slate-300 font-medium">Personalized Menu Recommendations</p>
                 </div>
                 
                 {!results.ingredientsFound && (
@@ -511,7 +514,7 @@ const App: React.FC = () => {
                             </a>
                           )}
                         </div>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">{item.description}</p>
+                        <p className="text-slate-500 dark:text-slate-300 text-sm">{item.description}</p>
                       </div>
                       <div className="bg-emerald-50/50 dark:bg-emerald-950/30 p-4 rounded-2xl border border-emerald-50 dark:border-emerald-900/50">
                         <p className="text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase mb-1 flex items-center gap-1">
@@ -552,7 +555,7 @@ const App: React.FC = () => {
                               </a>
                             )}
                           </div>
-                          <p className="text-slate-500 dark:text-slate-400 text-sm">{item.description}</p>
+                          <p className="text-slate-500 dark:text-slate-300 text-sm">{item.description}</p>
                         </div>
                         <div className="bg-amber-50/50 dark:bg-amber-950/30 p-4 rounded-2xl border border-amber-50 dark:border-amber-900/50">
                           <p className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase mb-1 flex items-center gap-1">
@@ -594,7 +597,7 @@ const App: React.FC = () => {
                               </a>
                             )}
                           </div>
-                          <p className="text-slate-500 dark:text-slate-400 text-sm">{item.description}</p>
+                          <p className="text-slate-500 dark:text-slate-300 text-sm">{item.description}</p>
                         </div>
                         <div className="bg-red-50 dark:bg-red-950/30 p-4 rounded-2xl border border-red-100 dark:border-red-900/50">
                           <p className="text-xs font-bold text-red-800 dark:text-red-400 uppercase mb-1 flex items-center gap-1">
