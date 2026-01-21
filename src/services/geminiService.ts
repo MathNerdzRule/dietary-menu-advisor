@@ -75,7 +75,58 @@ export const createGeminiService = (apiKey: string) => {
     return extractJSON(result.response.text());
   };
 
-  return { reverseGeocode, findRestaurantAndGetMenu, getRecommendations };
+  const fileToGenerativePart = async (file: File): Promise<{ inlineData: { data: string, mimeType: string } }> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64Data = (reader.result as string).split(',')[1];
+        resolve({
+          inlineData: {
+            data: base64Data,
+            mimeType: file.type
+          }
+        });
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const analyzeImage = async (imageFile: File, restaurant: Restaurant, restrictions: UserRestrictions): Promise<Recommendations> => {
+    const restrictionStr = [
+      restrictions.glutenFree ? "Gluten-Free" : "",
+      restrictions.dairyFree ? "Dairy-Free" : "",
+      restrictions.gastroparesis ? "Gastroparesis" : "",
+      ...restrictions.allergies,
+      restrictions.other
+    ].filter(Boolean).join(", ");
+
+    const gpPrompt = restrictions.gastroparesis ? GP_CONTEXT : "";
+
+    const prompt = `
+      Analyze the captured menu items in this image for "${restaurant.name}" against these restrictions: ${restrictionStr}.
+      ${gpPrompt}
+      
+      Identify the items in the image. If more than one item is present, analyze each one.
+      Verify ingredients via Google Search if possible to be extra sure.
+      Return a JSON object with:
+      safe: Array of items { name, description, reason, url }.
+      caution: Array of items { name, description, reason, url }.
+      avoid: Array of items { name, description, reason, url }.
+      ingredientsFound: boolean (true if you could identify the items and their ingredients).
+    `;
+
+    const imageParts = await fileToGenerativePart(imageFile);
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }, imageParts] }],
+      tools: [{ googleSearch: {} } as any],
+    });
+
+    return extractJSON(result.response.text());
+  };
+
+  return { reverseGeocode, findRestaurantAndGetMenu, getRecommendations, analyzeImage };
 };
 
 export const withRetry = async <T>(fn: () => Promise<T>, retries = 3): Promise<T> => {

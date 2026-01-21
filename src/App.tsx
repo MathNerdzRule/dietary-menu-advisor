@@ -1,5 +1,5 @@
 // Dietary Menu Advisor - Built with Antigravity AI (V1.3)
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
@@ -18,7 +18,8 @@ import {
   Sun,
   Moon,
   Monitor,
-  Star
+  Star,
+  Camera
 } from 'lucide-react';
 import { createGeminiService, withRetry } from './services/geminiService';
 import type { AppState, Restaurant, Recommendations, UserRestrictions, FavoriteItem, RecommendationItem } from './types';
@@ -84,6 +85,7 @@ const App: React.FC = () => {
   const [foundRestaurant, setFoundRestaurant] = useState<Restaurant | null>(null);
   const [foundMenu, setFoundMenu] = useState<any>(null);
   const [results, setResults] = useState<Recommendations | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const gemini = useMemo(() => apiKey ? createGeminiService(apiKey) : null, [apiKey]);
 
@@ -176,6 +178,24 @@ const App: React.FC = () => {
     } catch (e: any) {
       setError(e.message || "Analysis failed.");
       setAppState('CONFIRMING_RESTAURANT');
+    }
+  };
+
+  const handleCaptureImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setAppState('ANALYZING_MENU');
+    try {
+      const data = await withRetry(() => gemini!.analyzeImage(file, foundRestaurant!, restrictions));
+      setResults(data);
+      setAppState('SHOWING_RESULTS');
+    } catch (e: any) {
+      setError(e.message || "Image analysis failed. Please try again or use text analysis.");
+      setAppState('CONFIRMING_RESTAURANT');
+    } finally {
+      // Clear input so same file can be captured again if needed
+      if (event.target) event.target.value = '';
     }
   };
 
@@ -490,12 +510,28 @@ const App: React.FC = () => {
                     )}
                   </div>
 
-                  <button 
-                    onClick={handleAnalyze}
-                    className="w-full bg-nourish-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-nourish-100 hover:bg-nourish-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
-                  >
-                    Analyze Menu
-                  </button>
+                  <div className="grid grid-cols-1 gap-4">
+                    <button 
+                      onClick={handleAnalyze}
+                      className="w-full bg-nourish-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-nourish-100 hover:bg-nourish-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                    >
+                      Analyze Menu
+                    </button>
+                    <button 
+                      onClick={() => cameraInputRef.current?.click()}
+                      className="w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white py-5 rounded-2xl font-bold text-lg border-2 border-slate-200 dark:border-slate-800 hover:border-nourish-400 hover:text-nourish-600 active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
+                    >
+                      <Camera className="w-5 h-5 text-slate-400 group-hover:text-nourish-600 transition-colors" /> Capture Menu Item
+                    </button>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      capture="environment" 
+                      className="hidden" 
+                      ref={cameraInputRef}
+                      onChange={handleCaptureImage}
+                    />
+                  </div>
                 </div>
               </div>
             </motion.div>
