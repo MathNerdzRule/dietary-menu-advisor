@@ -85,6 +85,7 @@ const App: React.FC = () => {
   const [foundRestaurant, setFoundRestaurant] = useState<Restaurant | null>(null);
   const [foundMenu, setFoundMenu] = useState<any>(null);
   const [results, setResults] = useState<Recommendations | null>(null);
+  const [lastQuery, setLastQuery] = useState<{name: string, location: string} | null>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const gemini = useMemo(() => apiKey ? createGeminiService(apiKey) : null, [apiKey]);
@@ -152,6 +153,13 @@ const App: React.FC = () => {
   const handleStartSearch = async () => {
     if (!restaurantName) return setError("Please enter a restaurant name.");
     if (!location) return setError("Please enter a location or detect your current one.");
+    
+    // Skip if searching for the exact same restaurant results we already have
+    if (foundRestaurant && lastQuery?.name === restaurantName && lastQuery?.location === location) {
+      setAppState('CONFIRMING_RESTAURANT');
+      return;
+    }
+
     setError(null);
     setAppState('LOADING_MENU');
     try {
@@ -159,6 +167,7 @@ const App: React.FC = () => {
       if (data && data.restaurant) {
         setFoundRestaurant(data.restaurant);
         setFoundMenu(data.menu);
+        setLastQuery({ name: restaurantName, location });
         setAppState('CONFIRMING_RESTAURANT');
       } else {
         throw new Error("Could not find restaurant or menu.");
