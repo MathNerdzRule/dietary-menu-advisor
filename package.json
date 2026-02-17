@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/camera": "^8.0.1",
+    "@capacitor/core": "^8.1.0",
+    "@capacitor/preferences": "^8.0.1",
     "@google/generative-ai": "^0.24.1",
     "@tailwindcss/postcss": "^4.1.18",
     "framer-motion": "^12.23.26",
