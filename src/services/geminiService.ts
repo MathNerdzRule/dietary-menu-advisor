@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { Restaurant, Recommendations, UserRestrictions } from "../types";
-import { GP_CONTEXT, DEFAULT_SEARCH_CONTEXT } from "../constants";
+import { GP_CONTEXT, DIABETIC_CONTEXT, DEFAULT_SEARCH_CONTEXT } from "../constants";
 
 // Helper to extract JSON from AI markdown blocks
 const extractJSON = (text: string) => {
@@ -42,22 +42,56 @@ export const createGeminiService = (apiKey: string) => {
     return extractJSON(result.response.text());
   };
 
+  const searchNearbyRestaurants = async (location: string, radius: number, restrictions: UserRestrictions): Promise<Restaurant[]> => {
+    const restrictionStr = [
+      restrictions.glutenFree ? "Gluten-Free" : "",
+      restrictions.dairyFree ? "Dairy-Free" : "",
+      restrictions.vegan ? "Vegan" : "",
+      restrictions.vegetarian ? "Vegetarian" : "",
+      restrictions.lowSodium ? "Low-Sodium" : "",
+      restrictions.keto ? "Keto" : "",
+      restrictions.diabetic ? "Diabetic friendly" : "",
+      restrictions.gastroparesis ? "Gastroparesis friendly" : "",
+      ...restrictions.allergies,
+      restrictions.other
+    ].filter(Boolean).join(", ");
+
+    const prompt = `Use Google Search to find restaurants within ${radius} miles of "${location}" that are suitable for someone with these dietary needs: ${restrictionStr}.
+    Return a JSON array of objects, each with: { name, address, website }.
+    Only return highly relevant matches.`;
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      tools: [{ googleSearch: {} } as any],
+    });
+
+    return extractJSON(result.response.text()) || [];
+  };
+
   const getRecommendations = async (restaurant: Restaurant, menu: any, restrictions: UserRestrictions): Promise<Recommendations> => {
     const restrictionStr = [
       restrictions.glutenFree ? "Gluten-Free" : "",
       restrictions.dairyFree ? "Dairy-Free" : "",
+      restrictions.vegan ? "Vegan" : "",
+      restrictions.vegetarian ? "Vegetarian" : "",
+      restrictions.lowSodium ? "Low-Sodium" : "",
+      restrictions.keto ? "Keto" : "",
+      restrictions.diabetic ? "Diabetic" : "",
       restrictions.gastroparesis ? "Gastroparesis" : "",
       ...restrictions.allergies,
       restrictions.other
     ].filter(Boolean).join(", ");
 
     const gpPrompt = restrictions.gastroparesis ? GP_CONTEXT : "";
+    const diabeticPrompt = restrictions.diabetic ? DIABETIC_CONTEXT : "";
 
     const prompt = `
       Analyze this menu for "${restaurant.name}" against these restrictions: ${restrictionStr}.
       ${gpPrompt}
+      ${diabeticPrompt}
       
       Verify ingredients via Google Search.
+      IMPORTANT: For the 'url' field, only provide a direct, verified link to the specific menu item or the restaurant's official menu page if found. If a direct item link isn't available, use a reputable third-party menu source (like DoorDash, UberEats, or Yelp). Do not provide placeholder or broken links.
       Return a JSON object with:
       safe: Array of items { name, description, reason, url }.
       caution: Array of items { name, description, reason, url }.
@@ -96,19 +130,27 @@ export const createGeminiService = (apiKey: string) => {
     const restrictionStr = [
       restrictions.glutenFree ? "Gluten-Free" : "",
       restrictions.dairyFree ? "Dairy-Free" : "",
+      restrictions.vegan ? "Vegan" : "",
+      restrictions.vegetarian ? "Vegetarian" : "",
+      restrictions.lowSodium ? "Low-Sodium" : "",
+      restrictions.keto ? "Keto" : "",
+      restrictions.diabetic ? "Diabetic" : "",
       restrictions.gastroparesis ? "Gastroparesis" : "",
       ...restrictions.allergies,
       restrictions.other
     ].filter(Boolean).join(", ");
 
     const gpPrompt = restrictions.gastroparesis ? GP_CONTEXT : "";
+    const diabeticPrompt = restrictions.diabetic ? DIABETIC_CONTEXT : "";
 
     const prompt = `
       Analyze the captured menu items in this image for "${restaurant.name}" against these restrictions: ${restrictionStr}.
       ${gpPrompt}
+      ${diabeticPrompt}
       
       Identify the items in the image. If more than one item is present, analyze each one.
       Verify ingredients via Google Search if possible to be extra sure.
+      IMPORTANT: For the 'url' field, only provide a direct, verified link to the specific menu item or the restaurant's official menu page if found. If a direct item link isn't available, use a reputable third-party menu source (like DoorDash, UberEats, or Yelp). Do not provide placeholder or broken links.
       Return a JSON object with:
       safe: Array of items { name, description, reason, url }.
       caution: Array of items { name, description, reason, url }.
@@ -126,7 +168,7 @@ export const createGeminiService = (apiKey: string) => {
     return extractJSON(result.response.text());
   };
 
-  return { reverseGeocode, findRestaurantAndGetMenu, getRecommendations, analyzeImage };
+  return { reverseGeocode, findRestaurantAndGetMenu, searchNearbyRestaurants, getRecommendations, analyzeImage };
 };
 
 export const withRetry = async <T>(fn: () => Promise<T>, retries = 3): Promise<T> => {

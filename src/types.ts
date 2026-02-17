@@ -28,15 +28,23 @@ export interface Recommendations {
 
 export type AppState = 
   | 'INITIAL_SEARCH'
+  | 'SEARCHING_RESTAURANTS'
   | 'LOADING_MENU'
   | 'CONFIRMING_RESTAURANT'
   | 'ANALYZING_MENU'
   | 'SHOWING_RESULTS';
 
+export type TabState = 'RESTRICTIONS' | 'SEARCH';
+
 export interface UserRestrictions {
   glutenFree: boolean;
   dairyFree: boolean;
   gastroparesis: boolean;
+  vegan: boolean;
+  vegetarian: boolean;
+  lowSodium: boolean;
+  keto: boolean;
+  diabetic: boolean;
   allergies: string[];
   other: string;
 }

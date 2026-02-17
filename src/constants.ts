@@ -17,6 +17,12 @@ Forbidden: Beef, pork, bacon, dark meat, whole grains, nuts, seeds, raw veg/frui
 Caution: High fat (fried, cream, butter).
 `;
 
+export const DIABETIC_CONTEXT = `
+For Diabetic restrictions: Categorize items into 'safe' (low glycemic index, high fiber, lean proteins, healthy fats) and 'caution' (moderate carbs, natural sugars).
+Items to 'avoid' or flag as high risk: High added sugars, refined carbohydrates (white bread, pasta, sugary drinks), and excessive saturated fats.
+Focus on blood sugar stability.
+`;
+
 export const LOCATION_MESSAGES = [
   "Locating the restaurant entrance...",
   "Confirming the physical address...",
