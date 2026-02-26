@@ -19,7 +19,7 @@ const extractJSON = (text: string) => {
 export const createGeminiService = (apiKey: string) => {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ 
-    model: "gemini-3-flash-latest" 
+    model: "gemini-flash-latest" 
   });
 
   const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
