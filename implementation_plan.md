@@ -19,7 +19,7 @@ Building a premium, AI-powered menu advisor for users with strict dietary needs.
 
 ## 3. Core Logic (Services)
 
-- [x] `geminiService.ts`: Implement `findRestaurantAndGetMenu` and `getRecommendations` using `gemini-3-flash-preview` with Google Search tool.
+- [x] `geminiService.ts`: Implement `findRestaurantAndGetMenu` and `getRecommendations` using `gemini-3-flash-latest` with Google Search tool.
 - [x] `types.ts`: Defined strict TypeScript interfaces for Restaurants, MenuItems, and AppState.
 - [x] `constants.ts`: Contextual prompts for dietary restrictions (including detailed Gastroparesis logic).
 
